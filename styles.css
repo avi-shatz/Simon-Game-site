@@ -3,9 +3,15 @@ body {
   background-color: #011F3F;
 }
 
+footer {
+  font-size: 1.5rem;
+  color: white;
+  padding: 20px;
+}
+
 #level-title {
   font-family: 'Press Start 2P', cursive;
-  font-size: 3rem;
+  font-size: 3.3rem;
   margin:  5%;
   color: #FEF2BF;
 }
@@ -15,6 +21,10 @@ body {
   width: 50%;
   margin: auto;
 
+}
+
+.start {
+  width: 10%;
 }
 
 .btn {
