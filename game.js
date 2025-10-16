@@ -1,4 +1,4 @@
-// initialeze game vaiables
+// initialize game variables
 var gamePattern = [];
 var userClickedPattern = [];
 var buttonColours = ["red", "blue", "green", "yellow"];
@@ -6,14 +6,25 @@ var animeTime = 150;
 var currentPhase = 0;
 var level = 0;
 var gameStarted = false;
+var isPlayingBack = false; // lock user input during sequence playback
 
-// start the game by pressing the
-// start button ar any key from the keybord.
+// simple audio cache to reduce latency (initialized on first start)
+var audioCache = null;
+
+// start the game by pressing the start button or any keyboard key.
 $(".start").click(startGame);
 $(document).keydown(startGame);
+$(".start").on("keydown", function(e) {
+  if (e.key === "Enter" || e.key === " ") {
+    startGame();
+  }
+});
 
 // binding game buttons to game logic
 $(".btn").click(function() {
+  if (!gameStarted || isPlayingBack) {
+    return;
+  }
   animatePress(this.id);
   if (gameStarted) {
     userClickedPattern.push(this.id);
@@ -28,7 +39,7 @@ $(".btn").click(function() {
     currentPhase++;
     // if player finished sequence, display the next color.
     if (currentPhase == gamePattern.length) {
-      setTimeout(nextSequence, 1000);
+      setTimeout(nextSequence, 800);
     }
 
   }
@@ -43,25 +54,52 @@ function startGame() {
     $(".start").slideUp("fast");
     setTimeout(function() {
       gameStarted = true;
+      // initialize audio on first user interaction to comply with autoplay policies
+      if (!audioCache) {
+        initAudio();
+      }
       nextSequence();
     }, animeTime);
   }
 }
 
 /**
- * get randomly the next color in the sequence,
- * and press the the chosen button
+ * choose the next color in the sequence,
+ * then replay the full sequence to the player
  */
 function nextSequence() {
   userClickedPattern = [];
   currentPhase = 0;
   level++;
   $("h1").text("Level " + level);
-  rand = getRandomInt(0, 3);
-  randColour = buttonColours[rand];
-  $("." + randColour).fadeOut(animeTime).fadeIn(animeTime);
-  playSound(randColour);
+  const rand = getRandomInt(0, 3);
+  const randColour = buttonColours[rand];
   gamePattern.push(randColour);
+  // play back the entire sequence
+  playSequence(gamePattern);
+}
+
+
+/**
+ * play the full sequence with timing and lock input during playback
+ * @param {string[]} sequence
+ */
+function playSequence(sequence) {
+  isPlayingBack = true;
+  var step = 0;
+  function playStep() {
+    if (step >= sequence.length) {
+      isPlayingBack = false;
+      return;
+    }
+    var colour = sequence[step];
+    $(".#".replace('#','') + colour); // no-op to preserve style
+    $("." + colour).fadeOut(animeTime).fadeIn(animeTime);
+    playSound(colour);
+    step++;
+    setTimeout(playStep, Math.max(400, animeTime * 3));
+  }
+  playStep();
 }
 
 
@@ -100,7 +138,7 @@ function gameOver() {
   gameStarted = false;
 
   // displaying game over message
-  $("h1").text("Game Over, Press Any Key to Restart ");
+  $("h1").text("Game Over. Press any key or tap Start to play again");
 }
 
 /**
@@ -113,20 +151,40 @@ function checkAnswer(currentPhase) {
 }
 
 /**
- * play sound from a file
+ * play sound from a file (reused audio elements)
  * @param  {string} name The sound file name
  */
 function playSound(name) {
+  if (audioCache && audioCache[name]) {
+    try {
+      audioCache[name].currentTime = 0;
+      audioCache[name].play();
+      return;
+    } catch (e) {}
+  }
   var audio = new Audio("sounds/" + name + ".mp3");
   audio.play();
 }
 
 /**
- * get a random number from a min and max range
+ * preload and cache audio elements for faster playback
+ */
+function initAudio() {
+  audioCache = {};
+  var names = ["red", "blue", "green", "yellow", "wrong"];
+  for (var i = 0; i < names.length; i++) {
+    audioCache[names[i]] = new Audio("sounds/" + names[i] + ".mp3");
+  }
+}
+
+/**
+ * get a random integer in [min, max]
  * @param  {Number} min The minimum number
  * @param  {Number} max The maximum number
  * @return {Number}     The random number
  */
-function getRandomInt(min = 0, max = 1) {
-  return min + Math.floor(Math.random() * Math.floor(max - min + 1));
+function getRandomInt(min, max) {
+  if (typeof min !== 'number') min = 0;
+  if (typeof max !== 'number') max = 1;
+  return min + Math.floor(Math.random() * (max - min + 1));
 }

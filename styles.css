@@ -61,3 +61,38 @@ footer {
   box-shadow: 0 0 20px white;
   background-color: grey;
 }
+
+/* focus styles for accessibility */
+.btn:focus-visible,
+.start:focus-visible {
+  outline: 4px solid #FEF2BF;
+  outline-offset: 2px;
+}
+
+/* responsive tweaks */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+  .btn {
+    width: min(42vw, 160px);
+    height: min(42vw, 160px);
+    margin: 12px;
+  }
+  #level-title {
+    font-size: 2.2rem;
+  }
+  .start {
+    width: 20%;
+  }
+}
+
+@media (max-width: 420px) {
+  .btn {
+    width: min(44vw, 140px);
+    height: min(44vw, 140px);
+  }
+  #level-title {
+    font-size: 1.8rem;
+  }
+}

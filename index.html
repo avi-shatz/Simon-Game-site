@@ -19,30 +19,22 @@
 </head>
 
 <body>
-  <h1 id="level-title">Press A Key to Start</h1>
-  <img class="start" src="images/start.png" alt="Start Image">
+  <h1 id="level-title" aria-live="polite" role="status">Press any key or tap Start to begin</h1>
+  <img class="start" src="images/start.png" alt="Start Image" role="button" tabindex="0" aria-label="Start game">
 
   <!-- game buttons -->
   <div class="container">
-    <div lass="row">
+    <div class="row">
 
-      <div type="button" id="green" class="btn green">
+      <button type="button" id="green" class="btn green" aria-label="Green"></button>
 
-      </div>
-
-      <div type="button" id="red" class="btn red">
-
-      </div>
+      <button type="button" id="red" class="btn red" aria-label="Red"></button>
     </div>
 
     <div class="row">
 
-      <div type="button" id="yellow" class="btn yellow">
-
-      </div>
-      <div type="button" id="blue" class="btn blue">
-
-      </div>
+      <button type="button" id="yellow" class="btn yellow" aria-label="Yellow"></button>
+      <button type="button" id="blue" class="btn blue" aria-label="Blue"></button>
 
     </div>
 
